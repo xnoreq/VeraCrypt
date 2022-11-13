@@ -13988,8 +13988,12 @@ BOOL SetPrivilege(LPTSTR szPrivilegeName, BOOL bEnable)
 			tkp.Privileges[0].Attributes = bEnable? SE_PRIVILEGE_ENABLED : SE_PRIVILEGE_REMOVED;
 			
 			bRet = AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, NULL, NULL);
-			if (!bRet)
-				dwLastError = GetLastError ();
+			// AdjustTokenPrivileges returning nonzero does not guarantee that all specified
+			// privileges have been adjusted,
+			// GetLastError returns ERROR_NOT_ALL_ASSIGNED instead of ERROR_SUCESS in that case
+			dwLastError = GetLastError();
+			if (dwLastError != ERROR_SUCCESS)
+				bRet = FALSE;
 		}
 		else
 			dwLastError = GetLastError ();
