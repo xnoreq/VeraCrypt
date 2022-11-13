@@ -2541,6 +2541,14 @@ static void __cdecl volTransformThreadFunction (void *hwndDlgArg)
 		}
 	}
 
+	if (!SetPrivilege(SE_MANAGE_VOLUME_NAME, TRUE))
+	{
+		if (Silent || (MessageBoxW(hwndDlg, GetString ("ADMIN_PRIVILEGES_WARN_MANAGE_VOLUME"), lpszTitle, MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDNO))
+			goto cancel;
+		else
+			fastCreateFile = FALSE;
+	}
+
 	if (!bInPlaceEncNonSys)
 	{
 		if (!bDevice)
